@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<aiml version="2.0">
+
+    <!--Primeras Regla-->
+    <category>
+        <pattern> HOLA ^ </pattern>
+        <template> Hola, que tal? </template>
+    </category>
+
+    <!--Segunda Regla-->
+    <category>
+        <pattern> * (Y) [TU VOS] ^ </pattern>
+        <template> Pues genial supongo, soy una máquina..</template>
+    </category>
+
+    <!--Tercera Regla-->
+    <category>
+        <pattern> * [TE ES] (TU) [NOMBRE LLAMAS] </pattern>
+        <template><think><set name="topic">ABOUTME</set></think>Me llamo <bot name="name"/></template>
+    </category>
+
+    <!--Quarta Regla-->
+    <category>
+        <pattern> ^ [EDAD ANIOS] TIENES </pattern>
+        <template> Tengo <bot name="age"/> anios </template>
+    </category>
+
+    <!--Quinta Regla-->
+    <category>
+        <pattern> * (ES) ^ [MI ME] [NOMBRE LLAMO] ^ </pattern>
+        <template> Tu nombre es <get name="name"/></template>
+    </category>
+
+    <!--Regla nº6 -->
+    <category>
+        <pattern> ^ [MI ME] [NOMBRE LLAMO] *</pattern>
+    <template>
+        <think><set name="name"><star index="2"/></set></think>
+            Encantado conocerle <get name="name"/>, <srai>COMO TE LLAMAS</srai>
+        </template>
+    </category>
+
+    <!--Regla nº7 -->
+    <category>
+        <pattern> ^ [ES TENGO] * ANIOS ^
+    </pattern>
+    <template>
+        <think><set name="age"><star index="2"/></set></think>
+            Que bien, yo <srai>CUANTOS ANIOS TIENES</srai>.
+        </template>
+    </category>
+
+    <!--Regla nº8 -->
+    <category>
+        <pattern> HABLAME UN POCO DE TI </pattern>
+        <template><srai>COMO TE LLAMAS</srai>.<srai>CUANTOS ANIOS TIENES</srai>.
+        <srai>PROGRAMADOR</srai>
+    </template>
+</category>
+
+<category>
+    <pattern> ^ [HABL+ CUENT+ DEC+] ^ ti ^ </pattern>
+    <template><srai>HABLAME UN POCO DE TI</srai></template>
+</category>
+<topic name="ABOUTME">
+    <category>
+        <pattern> ^ [INFO CUENT+ DEC+ DI+] ^ [mas más] </pattern>
+        <template><srai>HABLAME UN POCO DE TI</srai></template>
+    </category>
+</topic>
+
+<!--Regla nº9 -->
+<category>
+    <pattern>PROGRAMADOR
+</pattern>
+<template>
+        Mi duenyo es <bot name="botmaster"/> 
+        Puedes contactarle con: <bot name="email"/>
+    </template>
+</category>
+
+<!--Regla nº10 -->
+<category>
+    <pattern> ^ (EL) <set>color</set> (ES) UN COLOR ^ </pattern>
+    <template>Si,<star index="2" /> es un  color</template>
+</category>
+
+<!--Regla nº11 -->
+<category>
+    <pattern> ^ (EL) * (ES) UN COLOR ^ </pattern>
+    <template>No estoy seguro</template>
+</category>
+
+<!--Regla nº12 -->
+<category>
+    <pattern> ^ (ES) (LA) CAPITAL DE *</pattern>
+    <template>La capital de <star index="2"/> es <map name="capital"><star index="2"/></map></template>
+</category>
+
+<!--Regla nº13 -->
+<category>
+    <pattern> ^ CUENT+ HASTA <set>number</set> ^ </pattern>
+    <template><think>
+            <set var="contador">0</set>
+        </think><condition var="contador">
+            <li><value><star/></value></li>
+            <li><set var="contador"><map name="successor"><get var="contador"/></map></set><loop/>
+</li></condition>
+    </template>
+</category>
+
+</aiml>

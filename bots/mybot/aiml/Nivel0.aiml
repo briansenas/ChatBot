@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<aiml version="2.0">
+
+<!-- REGLA Nº1 -->
+<category>
+    <pattern> ^ ESTAC+ ^ ESTAMOS ^ </pattern>
+    <template>
+        <random>
+            <li>Estamos en <srai> SEASON </srai></li>
+            <li>Creo que es <srai> SEASON </srai>, no?</li>
+            <li>Recuerdo que es <srai>SEASON</srai></li>
+            <li>Lo acabo de mirar, es <srai>SEASON</srai> </li>
+        </random>
+        </template>
+</category>
+
+<!-- REGLA nº2 -->
+<category>
+  <pattern> ^ FASE ^ [DIA DÍA] ^ </pattern>
+  <template>
+    <random>
+        <li>Ya es <srai> DAY PHASE </srai></li>
+        <li>Ahora mismo estamos en la <srai> DAY PHASE </srai></li>
+        <li>Recuerdo que es <srai> DAY PHASE </srai></li>
+        <li>Lo acabo de mirar, ya es <srai> DAY PHASE </srai> </li>
+        <li>Dado que son las <srai>TIME</srai>, diría que por la <srai> DAY PHASE </srai> </li>
+    </random>
+  </template>
+</category>
+
+<!-- REGLA nº2.1 -->
+<category>
+  <pattern> ^ HORA(S) ^ [ES SON] ^ </pattern>
+  <template> Ahora mismo son las <srai>TIME</srai></template>
+</category>
+
+<!-- REGLA nº3 -->
+<category>
+  <pattern> ^ [DIA DÍA] ^ [ES SER+]  * </pattern>
+  <template><think>
+      <set var="find_day"><star index="3"/></set>
+  </think><condition var="find_day">
+  <li><value>hoy</value><get var="find_day"/> es <srai>DAY</srai></li>
+  <li><value>manyana</value><get var="find_day"/> será <srai>TOMORROW</srai></li>
+  <li><value>pasado manyana</value><get var="find_day"/> será <srai>DAY AFTER TOMORROW</srai></li>
+  <li>Creo que no te he entendido bien, no sé que responder...</li>
+    </condition>
+  </template>
+</category>
+
+<!-- REGLA nº4 -->
+<category>
+  <pattern> ^ [FECHA DIA DÍA] ^ [ES EN DE SER+] <set>numeros</set> SEMANA(S) ^ </pattern>
+  <template><think>
+      <set var="num_weeks"><map name="numeros"><star index="3"/></map></set>
+   </think><srai>FECHA DENTRO DE <get var="num_weeks"/> semanas </srai>
+  </template>
+</category>
+
+<!-- REGLA nº5 -->
+<category>
+  <pattern> ^ [FECHA DIA DÍA] ^ [ES EN DE SER+] <set>number</set> SEMANA(S) ^ </pattern>
+  <template><think><set var="ret"><srai>FECHASEMANAL <star index="3"/></srai></set>
+  </think><condition var="ret">
+    <li value="0"> Perdón, pero puedo realizar ese cálculo.</li>
+    <li><think>
+      <set var="day"><srai>TOP <get var="ret"/> </srai></set>
+      <set var="ret"><srai>REMAIN <get var="ret"/></srai></set>
+      <set var="month"><srai> TOP <get var="ret"/> </srai> </set>
+      <set var="ret"><srai> REMAIN <get var="ret"/></srai></set>
+    </think>Dentro de <star index="3"/> semana(s) será un <get var="day"/> de <get var="month"/> del <get var="ret"/> </li>
+  </condition>
+</template>
+</category>
+
+<!-- REGLA nº5 -->
+<category>
+  <pattern> FECHASEMANAL <set>number</set></pattern>
+  <template><think>
+      <set var="num_weeks"> <star index="1"/> </set>
+    </think><condition var="num_weeks">
+      <li value="1"><srai> DATE IN 7 DAYS </srai></li>
+      <li value="2"><srai> DATE IN 14 DAYS </srai></li>
+      <li value="3"><srai> DATE IN 21 DAYS </srai></li>
+      <li value="4"><srai> DATE IN 28 DAYS </srai></li>
+      <li value="5"><srai> DATE IN 35 DAYS </srai></li>
+      <li value="6"><srai> DATE IN 42 DAYS </srai></li>
+      <li value="7"><srai> DATE IN 49 DAYS </srai></li>
+      <li value="8"><srai> DATE IN 56 DAYS </srai></li>
+      <li>0</li>
+    </condition>
+  </template>
+</category>
+
+ <!-- REGLA nº6 -->
+<category>
+  <pattern> ^ [FECHA DIA DÍA] ^ [ES SER+] ^ [EN DE] <set>number</set> [DIA DÍA](S) ^ </pattern>
+  <template><think>
+      <set var="ret"> <srai>DATE IN <star index="4"/> DAYS</srai></set>
+      <set var="day"><srai>TOP <get var="ret"/> </srai></set>
+      <set var="ret"><srai>REMAIN <get var="ret"/></srai></set>
+      <set var="month"><srai> TOP <get var="ret"/> </srai> </set>
+      <set var="ret"><srai> REMAIN <get var="ret"/></srai></set>
+  </think>Dentro de <star index="4"/> día(s) será un <srai>WEEKDAY IN <star index="4"/> DAYS</srai> día <get var="day"/> de <get var="month"/> del <get var="ret"/>  </template>
+</category>
+
+ <!-- REGLA nº7 -->
+<category>
+  <pattern> ^ [FECHA DIA DÍA] ^ [ES SER+] ^ [PROXIMO PRÓXIMO] <set>weekday_es</set> ^ </pattern>
+  <template><think>
+      <set var="ret"><srai>DATE ON <star index="4"/></srai></set>
+      <set var="day"><srai>TOP <get var="ret"/> </srai></set>
+      <set var="ret"><srai>REMAIN <get var="ret"/></srai></set>
+      <set var="month"><srai> TOP <get var="ret"/> </srai> </set>
+      <set var="ret"><srai> REMAIN <get var="ret"/></srai></set>
+      </think>El próximo <star index="4"/> será el <get var="day"/> de <get var="month"/> del <get var="ret"/> </template>
+</category>
+
+ <!-- REGLA nº8 -->
+<category>
+  <pattern> ^ [FECHA DIA DÍA] ^ [ES SER+] ^ [PROXIMO PRÓXIMO] <set>weekday</set> ^ </pattern>
+  <template><think>
+      <set var="ret"><srai>DATE ON <map name="days_to_es"><star index="4"/></map></srai></set>
+      <set var="day"><srai>TOP <get var="ret"/> </srai></set>
+      <set var="ret"><srai>REMAIN <get var="ret"/></srai></set>
+      <set var="month"><srai> TOP <get var="ret"/> </srai> </set>
+      <set var="ret"><srai> REMAIN <get var="ret"/></srai></set>
+      </think>El próximo <star index="4"/> será el <get var="day"/> de <get var="month"/> del <get var="ret"/> </template>
+</category>
+
+</aiml>
