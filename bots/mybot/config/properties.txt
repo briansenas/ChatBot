@@ -1,0 +1,7 @@
+name:botForAI
+email:briansena@correo.ugr.es
+age:19
+gender:male
+botmaster:Brian S.	
+organization:ugr
+version:0.0.4

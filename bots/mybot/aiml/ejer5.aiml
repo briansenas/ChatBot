@@ -1,0 +1,246 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<aiml version="2.0">
+
+  <!-- PREGUNTAS DE CONOCIMIENTO BASICO -->
+  <category>
+    <pattern> ^ COLOR ^ (DE)(EL) PELO (DE) <set>compi</set></pattern>
+    <template>
+            El color de pelo de <star index="3"/> es <map name="pelo"><star index="3"/></map>
+    </template>
+</category>
+
+<category>
+    <pattern> ^ COLOR ^ LOS OJOS (DE) <set>compi</set></pattern>
+    <template>
+            El color de los ojos de  <star index="3"/> es <map name="ojos"><star index="3"/></map>
+    </template>
+</category>
+
+<!-- MANIPULAR INFORMACION AL CONJUNTO DE DATOS -->
+
+<category>
+    <pattern>^ [CONOC+ SAB+] ([A QUIEN QUIÉN]) (ES) *</pattern>
+    <template>
+        <think>
+            <set name="compi"><readset>compi</readset></set>
+            <set name="lastnameused"><star index="2"/></set>
+            <set name="existe">
+                <srai>FINDITEM <star index="2"/> IN <get name="compi"/></srai>
+            </set>
+        </think>
+    <condition name="existe">
+        <li value="0">
+            <think>
+                <addtoset>
+                    <name>compi</name>
+                    <key><star index="2"/></key>
+                </addtoset>
+                <addtomap>
+                    <name>pelo</name>
+                    <key><star index="2"/></key>
+                    <value>No lo se aún</value>
+                </addtomap>
+                <addtomap>
+                    <name>ojos</name>
+                    <key><star index="2"/></key>
+                    <value>No lo se aún</value>
+                </addtomap>
+            </think>
+                Oh pues no le conocía, pero encantado <star index="2"/>! <srai> COMO TE LLAMAS </srai>
+        </li>
+        <li>
+                Hombre pues claro que conozco a <star index="2"/>!.
+        </li>
+    </condition>
+    </template>
+</category>
+
+<category>
+    <pattern>^ (EL) (COLOR DE) PELO DE * ES <set>color</set> </pattern>
+    <template>
+        <think>
+            <set name="compi"><readset>compi</readset></set>
+            <set name="lastnameused"><star index="2"/></set>
+            <set name="existe">
+                <srai> FINDITEM <star index="2"/> in <get name="compi"/></srai>
+            </set>
+        </think>
+        <condition name="existe">
+            <think>
+                <li value="0">
+                    <srai> CONOCES A <star index="2"/></srai>
+                </li>
+            </think>
+        </condition>
+        <modifymap>
+            <name>pelo</name>
+            <key><star index="2"/></key>
+            <value><star index="3"/></value>
+        </modifymap>
+            Le queda genial el pelo <star index="3"/> a <star index="2"/>
+    </template>
+</category>
+
+<category>
+    <pattern>^ (EL) (COLOR DE) PELO DE * ES * </pattern>
+    <template>
+       Perdón que me intrometa, pero eso no es un color según me dice un pajarito.
+    </template>
+</category>
+
+<category>
+    <pattern>* TIENE (EL) PELO <set>color</set> </pattern>
+    <template>
+        <srai> EL COLOR DE PELO DE <star index="1"/> ES <star index="2"/> </srai>
+    </template>
+</category>
+<!--
+<category>
+    <pattern> ^ (Y) (EL) (TIENE) (EL) PELO <set>color</set> </pattern>
+    <that> * TIENE LOS OJOS * <that>
+    <template>
+        <srai> EL COLOR DE PELO DE <get name="lastnameused"/> ES <star index="2"/> </srai>
+    </template>
+</category>
+    -->
+<category>
+    <pattern>^ (EL) (LOS) (COLOR DE) (LOS) OJO(S) DE * [ES SON] <set>color</set> </pattern>
+    <template>
+        <think>
+            <set name="compi"><readset>compi</readset></set>
+            <set name="lastnameused"><star index="2"/></set>
+            <set name="existe">
+                <srai> FINDITEM <star index="2"/> in <get name="compi"/></srai>
+            </set>
+        </think>
+        <condition name="existe">
+            <think>
+                <li value="0">
+                    <srai> CONOCES A <star index="2"/></srai>
+                </li>
+            </think>
+        </condition>
+        <modifymap>
+            <name>ojos</name>
+            <key><star index="2"/></key>
+            <value><star index="3"/></value>
+        </modifymap>
+            Le queda genial los ojos <star index="3"/> a <star index="2"/>
+    </template>
+</category>
+
+<category>
+    <pattern>^ (EL) (COLOR DE) (LOS) OJOS DE * [ES SON] * </pattern>
+    <template>
+       Perdón que me intrometa, pero eso no es un color según me dice un pajarito.
+    </template>
+</category>
+
+
+<category>
+    <pattern> * TIENE (EL)(LOS) OJO(S) <set>color</set> </pattern>
+    <template>
+        <srai> EL COLOR DE LOS OJOS DE <star index="1"/> ES <star index="2"/> </srai>
+    </template>
+</category>
+<!--
+<category>
+    <pattern> ^ (Y) (EL) (TIENE) (LOS) OJOS <set>color</set> </pattern>
+    <that> * TIENE EL PELO * <that>
+    <template>
+        <srai> EL COLOR DE LOS OJOS DE <get name="lastnameused"/> ES <star index="2"/> </srai>
+    </template>
+</category>
+    -->
+<category>
+    <pattern> * NO SO+ AMIGO(S) (CON) * (Y YO) </pattern>
+    <template>
+        <think>
+            <set name="compi"><readset>compi</readset></set>
+            <set var="pos">
+                <srai>FINDITEM <star index="2"/> IN <get name="compi"/></srai>
+            </set>
+        </think>
+        <condition var="pos">
+            <li value="0"> Como puedes pensar que yo si lo fuera? Siempre a su lado baby.</li>
+            <li>
+                <think>
+                    <removefromset>
+                        <name>compi</name>
+                        <key><star index="2"/></key>
+                    </removefromset>
+                </think>
+                    Tampoco es que me cayera tan bien si te digo la verdad.
+            </li>
+        </condition>
+    </template>
+</category>
+
+<category>
+    <pattern> * TIENE LOS OJOS <set>color</set> Y EL PELO <set>color</set> </pattern>
+    <template>
+        <srai> EL PELO DE <star index="1"/> ES <star index="3"/> </srai>
+        <srai> LOS OJOS DE <star index="1"/> SON <star index="2"/> </srai>
+    </template>
+</category>
+
+<!-- DESARROLLO DE PREGUNTAS DE MAPEO INVERSO -->
+<category>
+    <pattern> CHECK * FOR * </pattern>
+    <template>
+        <think>
+            <set var="search"><readkeys><star index="1"/></readkeys></set>
+            <set var="count"><srai>ITERATE <get var="search"/> </srai> </set>
+        </think>
+        <condition var="count">
+            <li value="$">y ahi creo que van todos!</li>
+            <li><think>
+                    <set var="match"><map><name><star index="1"/></name><get var="count"/></map></set>
+                </think><condition var="match"><li><value><star index="2"/></value><get var="count"/>, </li></condition><think>
+                    <set var="count"><srai>NEXT</srai></set>
+            </think><loop/></li>
+        </condition>
+    </template>
+</category>
+
+<category>
+    <pattern> ^ COMPANYERO(S) (QUE)[ES SON] <set>color</set> </pattern>
+    <template><srai> CHECK pelo FOR <star index="2"/> </srai> </template>
+</category>
+
+<category>
+    <pattern> ^ COMPANYERO(S) (QUE) [TIEN+ SON] [DE LOS] OJOS  <set>color</set> </pattern>
+    <template><srai> CHECK ojos FOR <star index="2"/> </srai> </template>
+</category>
+
+<!-- ANOTHER WAY OF SOLVING THE INVERSE MAP PROBLEM; PRETTIER BUT LESS EFFICIENTLY.
+<category>
+    <pattern> ^ COMPANERO(S) (QUE)[ES SON] <set>color</set> </pattern>
+    <template>
+        <think>
+        <set var="search"><readset>compi</readset></set>
+        <set var="count"><srai>ITERATE <get var="search"/> </srai> </set>
+        <condition var="count">
+            <li value="$"></li>
+            <li>
+                    <set var="match"><map name="pelo"><get var="count"/></map></set>
+                <condition var="match">
+                    <li><value><star index="2"/></value>
+                        <set var="result">
+                            <srai>ADDITEM <get var="count"/> IN <get var="result"/></srai>
+                        </set>
+                    </li>
+                </condition>
+                    <set var="count"><srai>NEXT</srai></set>
+                <loop/>
+            </li>
+        </condition>
+        <set var="count"><srai>ITERATE <get var="result"/></srai></set>
+        </think>
+        <condition var="count"><li value="$">Y ahi creo que van todos..</li>
+            <li><get var="count"/><think><set var="count"><srai>NEXT</srai></set></think><loop/> </li>
+        </condition>
+    </template>
+</category>
+    -->
+</aiml>

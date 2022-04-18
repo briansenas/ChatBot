@@ -1,0 +1,250 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<aiml version="2.0">
+
+  <category>
+    <pattern> # [CITA LIBRE(S) HUECO+] ^ [PARA PRÓXIM+ PROXIM+ SIGUIENTE(S)] ^ <set>weekday_es</set> ^ ([PARA POR EN] ^ <set>horarios</set> ^ )</pattern>
+    <template><think> 
+        <set var="timeset"><star index="7"/></set>
+        <set var="date"><srai> DATE ON <star index="4"/> </srai></set> 
+        </think><condition var="timeset">
+          <li><value></value>
+            <srai>LIBRE <get var="date"/> </srai> (<get var="date"/>) </li>
+          <li><think>
+              <srai>LIBRE <get var="date"/> </srai> 
+            </think><condition name="checklibre_ret">
+            <li value="TRUE"> Bueno, pues ese día tengo <srai>HORARIO <get var="timeset"/></srai> ¿A qué hora le vendría bien? (<get var="date"/>)</li>
+            <li value="FALSE"> Justo ese día me es imposible, <srai>PROPONER OTRO DIA</srai> (<get var="date"/>)</li>
+          </condition></li>
+      </condition>    
+    </template>
+  </category>
+
+  <!--Actualizada con las funciones del nivel 3 -->
+  <category>
+    <pattern> # HORA+ ^ [PARA PRÓXIM+ PROXIM+ SIGUIENTE(S)] ^ <set>weekday_es</set> ^ (A) [DESDE PARTIR] ^ <set>horas_validas</set> ^ </pattern>
+    <template><think> 
+        <set var="date"><srai> DATE ON <star index="4"/> </srai></set> 
+        <set var="num"><srai> ORDINAL <star index="7"/> </srai> </set>
+        <srai>LIBRE <get var="date"/></srai>
+        <srai>HORARIO DE <get var="num"/> A 21 </srai>
+        <set var="temp_list"><srai>CREATE INTERVAL <srai> HOURTONUM <get name="list_horario"/> </srai></srai></set>
+        <set var="result"><srai>ITERATEYCOMPARE <get var="temp_list"/></srai></set>
+        </think><condition name="checklibre_ret">
+            <li value="TRUE"> Bueno, pues ese día tengo libre <get var="result"/> ¿A qué hora le vendría bien? (<get var="date"/>)</li>
+            <li value="FALSE">Justo ese día me es imposible, <srai>PROPONER OTRO DIA</srai> (<get var="date"/>)</li>
+        </condition>
+    </template>
+  </category>
+
+  <category>
+    <pattern> # HORA+ ^ [PARA PRÓXIM+ PROXIM+ SIGUIENTE(S)] ^ <set>weekday_es</set> ^ (A) [DESDE PARTIR] ^ </pattern>
+    <template><think> 
+        <set var="date"><srai> DATE ON <star index="4"/> </srai></set> 
+        <srai>LIBRE <get var="date"/> </srai> 
+        </think><condition name="checklibre_ret">
+        <li value="TRUE">Perdón, pero creo que te has equivocado de hora. 
+       <srai>TODOSHORARIOS</srai> (<get var="date"/>)</li>
+          <li value="FALSE">Perdón, pero creo que te has equivocado de hora. Igualmente, ese día lo tengo entero ocupado (<get var="date"/>)</li>
+        </condition>
+    </template>
+  </category>
+
+  <category>
+    <pattern> # HORA+ ^ [PARA PRÓXIM+ PROXIM+ SIGUIENTE(S)] ^ <set>weekday_es</set> ^ </pattern>
+    <template><think> 
+        <set var="date"><srai> DATE ON <star index="4"/> </srai></set> 
+        <srai>LIBRE <get var="date"/> </srai> 
+        </think><condition name="checklibre_ret">
+          <li value="TRUE"><srai>TODOSHORARIOS</srai> (<get var="date"/>)</li>
+          <li value="FALSE">Ese día lo tengo entero ocupado (<get var="date"/>)</li>
+        </condition>
+    </template>
+  </category>
+
+  <category>
+    <pattern> ^ [CITA LIBRE(S) HUECO+] ^ [PRÓXIM+ PROXIM+ SIGUIENTE(S)] SEMANA ^ ([PARA POR EN] ^ <set>horarios</set> ^) </pattern>
+    <template><think> 
+        <set var="timeset"><star index="5"/></set>
+        <set var="date"><srai> DATE A WEEK FROM <srai>DAY</srai> </srai></set>
+        </think><condition var="timeset">
+          <li><value></value>
+            <srai>LIBRE <get var="date"/> </srai> (<get var="date"/>) </li>
+          <li><think>
+              <srai>LIBRE <get var="date"/> </srai> 
+            </think><condition name="checklibre_ret">
+            <li value="TRUE"> Bueno, pues el ese día tengo <srai>HORARIO <get var="timeset"/></srai> ¿A qué hora le vendría bien? (<get var="date"/>)</li>
+            <li value="FALSE">Justo ese día me es imposible, <srai>PROPONER OTRO DIA</srai> (<get var="date"/>)</li>
+          </condition></li>
+        </condition>
+    </template>
+  </category>
+ 
+ <category>
+    <pattern> ^ [CITA LIBRE(S) HUECO+] ^ [PRÓXIM+ PROXIM+ SIGUIENTE(S) DENTRO EN] ^ <set>number</set> SEMANA(S) ^ ([PARA POR EN] ^ <set>horarios</set> ^) </pattern>
+    <template><think>
+        <set var="timeset"><star index="7"/></set>
+        <set var="date"><srai> FECHASEMANAL <star index="4"/> </srai></set>
+        </think><condition var="timeset">
+        <li><value></value> <srai> LIBRE <get var="date"/> </srai> (<get var="date"/>)</li>
+          <li><think>
+              <srai> LIBRE <get var="date"/> </srai>
+        </think><condition name="checklibre_ret">
+        <li value="TRUE"> Bueno, pues ese día tengo <srai>HORARIO <get var="timeset"/></srai> ¿A qué hora le vendría bien?(<get var="date"/>)</li>
+        <li value="FALSE">Justo ese día me es imposible, <srai>PROPONER OTRO DIA</srai> (<get var="date"/>)</li>
+        </condition></li>
+      </condition>
+    </template>
+  </category>
+
+  <category>
+    <pattern> ^ [CITA LIBRE(S) HUECO+] ^ [PRÓXIM+ PROXIM+ SIGUIENTE(S) DENTRO EN] ^ <set>numeros</set> SEMANA(S) ^ ([PARA POR EN] ^ <set>horarios</set> ^)</pattern>
+    <template><think>
+        <set var="temp"><map name="numeros"><star index="4"/></map></set>
+        <set var="timeset"><star index="7"/></set>
+        </think><condition var="timeset">
+        <li><value></value><srai>CITA DENTRO DE <get var="temp"/> SEMANAS </srai></li>
+        <li><srai> CITA DENTRO DE <get var="temp"/> POR LA <get var="timeset"/> </srai></li>
+      </condition>
+    </template>
+  </category>
+
+  <category>
+    <pattern> ^ [CITA LIBRE(S) HUECO+] ^ <set>time_exp</set> ^ ([PARA POR EN] ^ <set>horarios</set> ^)</pattern>
+    <template><think>
+        <set var="time_exp"> <star index="3"/> </set>
+        <set var="timeset"><star index="6"/></set>
+        <set var="to_num"><map name="time_exp"><star index="3"/></map></set>
+        <set var="date"><srai>DATE IN <get var="to_num"/> DAYS </srai></set>
+        <condition var="time_exp">
+          <li value="ayer"><set var="time_exp">hoy</set></li>
+          <li value="ante ayer"><set var="time_exp">hoy</set></li>
+        </condition>
+        </think><condition var="timeset">
+        <li><value></value><srai> CITA <get var="date"/> </srai> (<get var="date"/>)</li>
+        <li><think>
+            <srai> CITA <get var="date"/> </srai>
+            </think><condition name="checklibre_ret">
+            <li value="TRUE"> Bueno, pues <get var="time_exp"/> tengo <srai> HORARIO <get var="timeset"/> </srai> ¿A qué hora le vendría bien? (<get var="date"/>)</li>
+            <li value="FALSE">Justo el <get var="date"/> me es imposible, <srai>PROPONER OTRO DIA</srai></li>
+        </condition></li>
+      </condition>
+    </template>
+  </category>
+
+  <category>
+    <pattern> ^ HORA+ ^ <set>time_exp</set> ^ ([PARA POR EN] ^ <set>horarios</set> ^)</pattern>
+    <template><think>
+        <set var="time_exp"> <star index="3"/> </set>
+        <set var="timeset"><star index="6"/></set>
+        <set var="to_num"><map name="time_exp"><star index="3"/></map></set>
+        <set var="date"><srai>DATE IN <get var="to_num"/> DAYS </srai></set>
+        <condition var="time_exp">
+          <li value="ayer"><set var="time_exp">hoy</set></li>
+          <li value="ante ayer"><set var="time_exp">hoy</set></li>
+        </condition>
+        </think><condition var="timeset">
+        <li><value></value><srai> HORASLIBRES <get var="date"/> </srai> (<get var="date"/>)</li>
+        <li><think>
+            <srai> CITA <get var="date"/> </srai>
+            </think><condition name="checklibre_ret">
+            <li value="TRUE"> Bueno, pues <get var="time_exp"/> tengo <srai> <get var="timeset"/> <get var="date"/> </srai> ¿A qué hora le vendría bien? (<get var="date"/>)</li>
+            <li value="FALSE">Justo el <get var="date"/> me es imposible, <srai>PROPONER OTRO DIA</srai></li>
+        </condition></li>
+      </condition>
+    </template>
+  </category>
+
+  <category>
+    <pattern> ^ HORA+ ^ [PRÓXIM+ PROXIM+ SIGUIENTE(S) DENTRO EN] ^ <set>number</set> SEMANA(S) ^ ([PARA POR EN] ^ <set>horarios</set> ^) </pattern>
+    <template><think>
+        <set var="time_exp"> <star index="3"/> </set>
+        <set var="timeset"><star index="6"/></set>
+        <set var="to_num"><map name="time_exp"><star index="3"/></map></set>
+        <set var="date"><srai> FECHASEMANAL <star index="4"/> </srai></set>
+        <condition var="time_exp">
+          <li value="ayer"><set var="time_exp">hoy</set></li>
+          <li value="ante ayer"><set var="time_exp">hoy</set></li>
+        </condition>
+        </think><condition var="timeset">
+        <li><value></value><srai> HORASLIBRES <get var="date"/> </srai> (<get var="date"/>)</li>
+        <li><think>
+            <srai> CITA <get var="date"/> </srai>
+            </think><condition name="checklibre_ret">
+            <li value="TRUE"> Bueno, pues <get var="time_exp"/> tengo <srai> <get var="timeset"/> <get var="date"/> </srai> ¿A qué hora le vendría bien? (<get var="date"/>)</li>
+            <li value="FALSE">Justo el <get var="date"/> me es imposible, <srai>PROPONER OTRO DIA</srai></li>
+        </condition></li>
+      </condition>
+    </template>
+  </category>
+
+  <category>
+    <pattern> ^ HORA+ ^ [PRÓXIM+ PROXIM+ SIGUIENTE(S) DENTRO EN] ^ <set>numeros</set> SEMANA(S) ^ ([PARA POR EN] ^ <set>horarios</set> ^)</pattern>
+    <template><think>
+        <set var="temp"><map name="numeros"><star index="4"/></map></set>
+        <set var="timeset"><star index="7"/></set>
+        </think><condition var="timeset">
+        <li><value></value><srai>HORARIO SIGUIENTE <get var="temp"/> SEMANAS </srai></li>
+        <li><srai> HORARIO SIGUIENTE <get var="temp"/> POR LA <get var="timeset"/> </srai></li>
+      </condition>
+    </template>
+  </category>
+
+ <category>
+    <pattern> ^ [CITA LIBRE(S) HUECO+] ^ [PRÓXIM+ PROXIM+ SIGUIENTE(S) DENTRO EN] ^ <set>number</set> [DÍA DIA](S) ^ ([PARA POR EN] ^ <set>horarios</set> ^) </pattern>
+    <template><think>
+        <set var="timeset"><star index="7"/></set>
+        <set var="date"><srai> DATE IN <star index="4"/> DAYS </srai></set>
+        </think><condition var="timeset">
+        <li><value></value> <srai> LIBRE <get var="date"/> </srai> (<get var="date"/>)</li>
+          <li><think>
+              <srai> LIBRE <get var="date"/> </srai>
+        </think><condition name="checklibre_ret">
+        <li value="TRUE"> Bueno, pues ese día tengo <srai>HORARIO <get var="timeset"/></srai> ¿A qué hora le vendría bien? (<get var="date"/>)</li>
+        <li value="FALSE">Justo ese día me es impossible, <srai>PROPONER OTRO DIA</srai></li>
+        </condition></li>
+      </condition>
+    </template>
+  </category>
+
+  <category>
+    <pattern> ^ [CITA LIBRE(S) HUECO+] ^ [PRÓXIM+ PROXIM+ SIGUIENTE(S) DENTRO EN] ^ <set>numeros</set> [DÍA DIA](S) ^ ([PARA POR EN] ^ <set>horarios</set> ^)</pattern>
+    <template><think>
+        <set var="temp"><map name="numeros"><star index="4"/></map></set>
+        <set var="timeset"><star index="7"/></set>
+        </think><condition var="timeset">
+        <li><value></value><srai>CITA DENTRO DE <get var="temp"/> DIAS </srai></li>
+        <li><srai> CITA DENTRO DE <get var="temp"/> POR LA <get var="timeset"/> </srai></li>
+      </condition>
+    </template>
+  </category>
+
+ <category>
+    <pattern> ^ HORA+ ^ [PRÓXIM+ PROXIM+ SIGUIENTE(S) DENTRO EN] ^ <set>number</set> [DÍA DIA](S) ^ ([PARA POR EN] ^ <set>horarios</set> ^) </pattern>
+    <template><think>
+        <set var="timeset"><star index="7"/></set>
+        <set var="date"><srai> DATE IN <star index="4"/> DAYS </srai></set>
+        </think><condition var="timeset">
+        <li><value></value> <srai>HORASLIBRES <get var="date"/> </srai> (<get var="date"/>)</li>
+          <li><think>
+              <srai> LIBRE <get var="date"/> </srai>
+        </think><condition name="checklibre_ret">
+        <li value="TRUE"> Bueno, pues ese día tengo <srai>HORARIO <get var="timeset"/></srai> ¿A qué hora le vendría bien? (<get var="date"/>)</li>
+        <li value="FALSE">Justo ese día me es impossible, <srai>PROPONER OTRO DIA</srai></li>
+        </condition></li>
+      </condition>
+    </template>
+  </category>
+
+  <category>
+    <pattern> ^ HORA+ ^ [PRÓXIM+ PROXIM+ SIGUIENTE(S) DENTRO EN] ^ <set>numeros</set> [DÍA DIA](S) ^ ([PARA POR EN] ^ <set>horarios</set> ^)</pattern>
+    <template><think>
+        <set var="temp"><map name="numeros"><star index="4"/></map></set>
+        <set var="timeset"><star index="7"/></set>
+        </think><condition var="timeset">
+        <li><value></value><srai>HORARIO DENTRO DE <get var="temp"/> DIAS </srai></li>
+        <li><srai> HORARIO DENTRO DE <get var="temp"/> POR LA <get var="timeset"/> </srai></li>
+      </condition>
+    </template>
+  </category>
+
+</aiml>

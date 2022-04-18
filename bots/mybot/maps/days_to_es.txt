@@ -1,0 +1,7 @@
+Sunday:Domingo
+Monday:Lunes
+Tuesday:Martes
+Wednesday:Miercoles
+Thursday:Jueves
+Friday:Viernes
+Saturday:Sabado

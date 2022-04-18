@@ -1,0 +1,513 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<aiml version="2.0">
+  
+  <!-- REGLA EXTRA Nº1 -->
+  <!-- No hace absolutamente nada en verdad -->
+  <category>
+    <pattern> ^ [GENIAL BIEN BUEN+ PERFEC+ MARAVILL+] </pattern>
+    <template><random>
+        <li>Sí!</li>
+        <li>Pues muy bien!</li>
+        <li>Y yo que me alegro!</li>
+        </random>
+      </template>
+    </category>
+
+  <!-- REGLAS <THAT> ?¿?¿ -->
+  <category>
+    <pattern> ^ [GUSTA+ QUIER+] ^ CITA </pattern>
+    <template>Claro! Sin problema. Dime qué día te vendría bien!</template>
+  </category>
+
+  <!-- REGLAS <THAT> ?¿?¿ -->
+  <category>
+    <pattern>PROPONER CITA</pattern>
+    <template><think><set name="topic">day_set</set></think>¿Deseas proceder con la cita?</template>
+  </category>
+  <!-- REGLAS <THAT> ?¿?¿ -->
+  <category>
+    <pattern>PROPONER OTRO DIA</pattern>
+    <template><think><set name="topic">other_day</set></think>¿Deseas otro día?</template>
+  </category>
+
+  <!-- REGLA Nº3 -->
+  <!-- Básicamente activamos el topic "day_set" para poder marcar citas (o no; Depende de sí hay
+    huecos libres o no) y luego creamos la llave del diccionario, leemos la sublista de horarios 
+  disponibles y llamamos a nuestra función auxiliar checklibre que nos "devuelve" un valor -->
+  <category>
+    <pattern> ^ <set>number</set> ^ <set>number</set> ^ (<set>number</set> ^)</pattern>
+    <template><think>
+        <set var="is_num"><map name="2digits"><star index="2"/></map></set>
+        <set var="is_anyo"><star index="6"/></set>
+        <condition var="is_anyo">
+          <li><value></value><set var="is_anyo"><date format="%Y" jformat="yy" /></set></li>
+        </condition>
+
+      <set name="topic">day_set</set>
+      <set name="key_fecha"><get var="is_num"/>_<star index="4"/>_<get var="is_anyo"/></set>
+      <srai>READLIST FROM 8 TO 20 </srai> 
+      <srai>CHECKLIBRE</srai>
+      </think><condition name="checklibre_ret">
+      <li value="TRUE">Sí, ¡tengo un hueco libre ese día!<srai>PROPONER CITA</srai></li>
+      <li value="FALSE">No, infelizmente no tengo un hueco ese día.<srai>PROPONER OTRO DIA</srai></li>
+      </condition>
+    </template>
+  </category>
+
+  <!-- REGLA Nº3.2.2 -->
+ <category>
+   <pattern> ^ <set>number</set> ^ <set>month_es</set> ^ (<set>number</set> ^ )</pattern>
+    <template><think>
+        <set var="is_mes"><map name="month_es"><star index="4"/></map></set>
+        <set var="is_anyo"><star index="6"/></set>
+        <condition var="is_anyo">
+          <li><value></value><set var="is_anyo"><date format="%Y" jformat="yy" /></set></li>
+        </condition>
+
+      </think><srai>LIBRES EL <star index="2"/> de <get var="is_mes"/> del <get var="is_anyo"/> </srai>
+    </template>
+  </category>
+
+  <topic name="otro_dia">
+ <!-- REGLA Nº3.2.4 -->
+ <category>
+   <pattern> ^ <set>number</set> ^ </pattern>
+    <template>
+      <srai>LIBRES EL <star index="2"/> de <date format="%B" jformat="MM"/> del <date format="%Y" jformat="yy"/></srai>
+    </template>
+  </category>
+</topic>
+
+ <!-- REGLA Nº3.2.4 -->
+ <category>
+   <pattern> ^ HUECO ^ <set>number</set> ^ </pattern>
+    <template>
+      <srai>LIBRES EL <star index="3"/> de <date format="%B" jformat="MM"/> del <date format="%Y" jformat="yy"/></srai>
+    </template>
+  </category>
+
+  <!-- REGLA Nº4 -->
+  <category>
+    <pattern> ^ OCUPADO(S) ^ <set>number</set> ^ (<set>number</set> ^ <set>number</set> ^)</pattern>
+    <template><think>
+        <set var="is_num"><map name="2digits"><star index="3"/></map></set>
+        <set var="is_mes"><star index="5"/></set>
+        <set var="is_anyo"><star index="7"/></set>
+        <condition var="is_mes">
+          <li><value></value><set var="is_mes"><date format="%B" jformat="MM" /></set></li>
+        </condition>
+        <condition var="is_anyo">
+          <li><value></value><set var="is_anyo"><date format="%Y" jformat="yy" /></set></li>
+        </condition>
+ 
+      <set name="topic">day_set</set>
+      <set name="key_fecha"><get var="is_num"/>_<get var="is_mes"/>_<get var="is_anyo"/></set>
+      <srai>READLIST FROM 8 TO 20 </srai> 
+      <srai>CHECKLIBRE</srai>
+      </think><condition name="checklibre_ret">
+        <li value="TRUE">No, ¡tengo un hueco libre ese día! <srai>PROPONER CITA</srai></li>
+        <li value="FALSE">Si, infelizmente no tengo un hueco ese día <srai>PROPONER OTRO DIA</srai></li>
+      </condition>
+    </template>
+  </category>
+ 
+  <!-- REGLA Nº5 -->
+ <category>
+   <pattern> ^ OCUPADO(S) ^ <set>number</set> ^ (<set>month_es</set> ^ <set>number</set> ^)</pattern>
+    <template><think>
+        <set var="is_mes"><star index="5"/></set>
+        <set var="is_anyo"><star index="7"/></set>
+        <condition var="is_mes">
+          <li><value></value><set var="is_mes"><date format="%B" jformat="MM" /></set></li>
+          <li><set var="is_mes"><map name="month_es"><get var="is_mes"/></map></set></li>
+        </condition>
+        <condition var="is_anyo">
+          <li><value></value><set var="is_anyo"><date format="%Y" jformat="yy" /></set></li>
+        </condition>
+ 
+      </think><srai>OCUPADOS EL <star index="3"/> DE <get var="is_mes"/> del <get var="is_anyo"/></srai>
+    </template>
+  </category>
+   
+  <!-- REGLA Nº6 -->
+  <!-- CREAR UNA SUBLISTA DESDE POSICIONES INDICADAS -->
+  <category>
+    <pattern>READLIST FROM <set>number</set> TO <set>number</set></pattern> 
+    <template><think>
+        <set name="list_key"><srai>LIST OF DAY <get name="key_fecha"/></srai></set>
+        <set name="list_key"><srai> SUBLIST FROM <star index="1"/> TO <star index="2"/> OF <get name="list_key"/> </srai> </set>
+      </think>
+      <get name="list_key"/>
+    </template>
+  </category>
+
+  <!-- REGLA EXTRA Nº2 para ignorar el horario de descanso -->
+  <!-- NOT IMPLEMENTED IN THE END -->
+  <category>
+    <pattern>IGNORE13</pattern>
+    <template><think>
+        <condition name="contador">
+          <li value="13"><set name="contador"><srai>PLUS <get name="contador"/> 1 </srai></set>
+            <set name="value"><srai>NEXT</srai></set></li>
+          <li></li>
+        </condition></think>
+    </template>
+  </category>
+
+  <!-- REGLA Nº7 -->
+      <!-- Básicamente leemos la lista eventos.txt desde las posiciones indicas por los <set>
+        y luego vamos iterando sobre los vaolres utilizando un contador que empieza con valor
+        inicial igual al principio de la lista cortada que hemos utilizado. Luego buscamos
+        coincidencias con LIBRE y añadimos los horarios a rlist_horario utilizando un map 
+        para convertir el contador en horario aceptable jformat="hh:00" luego como 
+      ADDITEM lo añade al principio tendremos que invertir la list -> list_horarios -->
+  <category>
+    <pattern> ^ HORA+( )(LIBRE)(S) DE <set>number</set> A <set>number</set></pattern> 
+    <template><think>
+      <set name="topic">day_set</set>
+      <srai>READLIST FROM <star index="2"/> TO <star index="3"/> </srai> 
+      <set name="value"><srai> ITERATE <get name="list_key"/> </srai> </set>
+      <set name="contador"> <star index="2"/> </set>
+      <set name="list_horario"></set>
+      <condition name="value">
+        <li value="$"></li>
+        <li value="NOLIBRE"><think>
+          <set name="value"><srai>NEXT</srai></set>
+          <set name="contador"><srai> PLUS <get name="contador"/> 1 </srai></set>
+          </think><loop/></li>
+        <li value="LIBRE">
+          <set var="temp"> <map name="2digits"> <get name="contador"/> </map>:00</set>
+          <set name="list_horario"><get name="list_horario"/> <get var="temp"/></set>
+          <set name="value"><srai>NEXT</srai></set>
+          <set name="contador"><srai> PLUS <get name="contador"/> 1 </srai></set>
+        <loop/></li>
+      </condition>
+      <condition name="list_horario">
+        <li><value></value><set name="list_horario">EMPTYLIST</set></li>
+      </condition>
+    </think><get name="list_horario"/></template>
+  </category>
+
+  <!-- REGLA Nº8 -->
+<category>
+  <pattern> ^ HORA+ ^ <set>number</set> ^ (<set>number</set> ^ <set>number</set> ^)</pattern>
+    <template><think>
+        <set var="is_num"><map name="2digits"><star index="3"/></map></set>
+        <set var="is_mes"><star index="5"/></set>
+        <set var="is_anyo"><star index="7"/></set>
+        <condition var="is_mes">
+          <li><value></value><set var="is_mes"><date format="%B" jformat="MM" /></set></li>
+        </condition>
+        <condition var="is_anyo">
+          <li><value></value><set var="is_anyo"><date format="%Y" jformat="yy" /></set></li>
+        </condition>
+        <set name="key_fecha"><get var="is_num"/>_<get var="is_mes"/>_<get var="is_anyo"/></set>
+      </think><srai>HORASLIBRES DE 8 A 20</srai>
+    </template>
+  </category>
+  
+  <!-- REGLA Nº9 -->
+ <category>
+   <pattern> ^ HORA+ ^ <set>number</set> ^ (<set>month_es</set> ^ <set>number</set> ^)</pattern>
+    <template><think>
+        <set var="is_num"><map name="2digits"><star index="3"/></map></set>
+        <set var="is_mes"><star index="5"/></set>
+        <set var="is_anyo"><star index="7"/></set>
+        <condition var="is_mes">
+          <li><value></value><set var="is_mes"><date format="%B" jformat="MM" /></set></li>
+          <li><set var="is_mes"><map name="month_es"><star index="5"/></map></set></li>
+        </condition>
+        <condition var="is_anyo">
+          <li><value></value><set var="is_anyo"><date format="%Y" jformat="yy" /></set></li>
+      </condition>
+      </think><srai>HORASLIBRES EL <get var="is_num"/> DE <get var="is_mes"/> DEL <get var="is_anyo"/></srai>
+    </template>
+  </category>
+
+  <!-- REGLA Nº10 -->
+ <category>
+   <pattern> ^ (HORA+) ([POR DE]) (LA) (HL)MANYANA ^ <set>number</set> ^ (<set>number</set> ^ <set>number</set> ^)</pattern>
+    <template><think>
+        <set var="is_num"><map name="2digits"><star index="3"/></map></set>
+        <set var="is_mes"><star index="5"/></set>
+        <set var="is_anyo"><star index="7"/></set>
+        <condition var="is_mes">
+          <li><value></value><set var="is_mes"><date format="%B" jformat="MM" /></set></li>
+        </condition>
+        <condition var="is_anyo">
+          <li><value></value><set var="is_anyo"><date format="%Y" jformat="yy" /></set></li>
+      </condition>
+
+        <set name="key_fecha"><get var="is_num"/>_<get var="is_mes"/>_<get var="is_anyo"/></set>
+        <srai>HORASLIBRES DE 8 A 12</srai>
+        <set name="list_morning"><get name="list_horario"/></set>
+        <set name="free_morning">FALSE</set>
+        </think><condition name="list_horario">
+          <li value="EMPTYLIST"><think>
+            <set name="free_morning">EMPTYLIST</set>
+            </think>la manyana entera ocupada. (EMPTYLIST) </li>
+          <li><think>
+              <set var="is_full"><srai>COUNT <get name="list_horario"/> </srai> </set>
+              </think><condition var="is_full">
+              <li value="5"><think>
+                  <set name="free_morning">TRUE</set>
+              </think>toda la manyana libre</li>
+              <li>por la mañana los siguientes huecos: <get name="list_horario"/></li>
+          </condition></li>
+        </condition>
+    </template>
+  </category>
+
+    <!-- REGLA Nº12 -->
+ <category>
+   <pattern> ^ (HORA+) ([POR DE]) (LA) (HL)MANYANA ^ <set>number</set> ^ (<set>month_es</set> ^ <set>number</set> ^)</pattern>
+   <template><think>
+        <set var="is_mes"><star index="5"/></set>
+        <set var="is_anyo"><star index="7"/></set>
+        <condition var="is_mes">
+          <li><value></value><set var="is_mes"><date format="%B" jformat="MM" /></set></li>
+          <li><set var="is_mes"><map name="month_es"><get var="is_mes"/></map></set></li>
+        </condition>
+        <condition var="is_anyo">
+          <li><value></value><set var="is_anyo"><date format="%Y" jformat="yy" /></set></li>
+      </condition>
+    </think><srai>HORASLIBRES MANYANA EL <star index="3"/> DE <get var="is_mes"/> DEL <get var="is_anyo"/></srai>
+    </template>
+  </category>
+
+    <!-- REGLA Nº13 -->
+ <category>
+   <pattern> ^ (HORA+) ([POR DE]) (LA) (HL)TARDE ^ <set>number</set> ^ (<set>number</set> ^ <set>number</set> ^)</pattern>
+    <template><think>
+        <set var="is_num"><map name="2digits"><star index="3"/></map></set>
+        <set var="is_mes"><star index="5"/></set>
+        <set var="is_anyo"><star index="7"/></set>
+        <condition var="is_mes">
+          <li><value></value><set var="is_mes"><date format="%B" jformat="MM" /></set></li>
+        </condition>
+        <condition var="is_anyo">
+          <li><value></value><set var="is_anyo"><date format="%Y" jformat="yy" /></set></li>
+      </condition>
+
+        <set name="key_fecha"><get var="is_num"/>_<get var="is_mes"/>_<get var="is_anyo"/></set>
+        <srai>HORASLIBRES DE 13 A 20</srai>
+        <set name="list_tarde"><get name="list_horario"/></set>
+        <set name="free_tarde">FALSE</set>
+      </think><condition name="list_horario">
+          <li value="EMPTYLIST"><think>
+            <set name="free_tarde">EMPTYLIST</set>
+            </think>la tarde entera ocupada. (EMPTYLIST) </li>
+          <li><think>
+              <set var="is_full"><srai>COUNT <get name="list_horario"/> </srai> </set>
+              </think><condition var="is_full">
+              <li value="8"><think>
+                  <set name="free_tarde">TRUE</set>
+              </think>toda la tarde libre </li>
+              <li>por la tarde: <get name="list_horario"/>. </li> 
+          </condition></li>
+        </condition>
+    </template>
+  </category>
+
+   <!-- REGLA Nº15 -->
+ <category>
+   <pattern> ^ (HORA+) ([POR DE]) (LA) (HL)TARDE ^ <set>number</set> ^ (<set>month_es</set> ^ <set>number</set> ^) </pattern>
+   <template><think>
+        <set var="is_mes"><star index="5"/></set>
+        <set var="is_anyo"><star index="7"/></set>
+        <condition var="is_mes">
+          <li><value></value><set var="is_mes"><date format="%B" jformat="MM" /></set></li>
+          <li><set var="is_mes"><map name="month_es"><get var="is_mes"/></map></set></li>
+        </condition>
+        <condition var="is_anyo">
+          <li><value></value><set var="is_anyo"><date format="%Y" jformat="yy" /></set></li>
+      </condition>
+      </think><srai>HORASLIBRES TARDE EL <star index="3"/> DE <get var="is_mes"/> DEL <get var="is_anyo"/></srai>
+    </template>
+  </category>
+
+  <!-- REGLA Nº16 -->
+  <category>
+    <pattern> ^ CITA ^ <set>number</set> ^ (<set>month_es</set> ^ <set>number</set> ^) </pattern>
+    <template><think>
+        <set var="is_mes"><star index="5"/></set>
+        <set var="is_anyo"><star index="7"/></set>
+        <condition var="is_mes">
+          <li><value></value><set var="is_mes"><date format="%B" jformat="MM" /></set></li>
+          <li><set var="is_mes"><map name="month_es"><star index="5"/></map></set></li>
+        </condition>
+        <condition var="is_anyo">
+          <li><value></value><set var="is_anyo"><date format="%Y" jformat="yy" /></set></li>
+      </condition>
+      </think><srai>CITA <star index="3"/> <get var="is_mes"/> <get var="is_anyo"/> </srai>
+    </template>
+  </category>
+
+  <!-- REGLA Nº17 -->
+  <category>
+    <pattern> ^ CITA ^ <set>number</set> ^ (<set>number</set> ^ <set>number</set>  ^) </pattern>
+    <template><think>
+        <set var="is_num"><map name="2digits"><star index="3"/></map></set>
+        <set var="is_mes"><star index="5"/></set>
+        <set var="is_anyo"><star index="7"/></set>
+        <condition var="is_mes">
+          <li><value></value><set var="is_mes"><date format="%B" jformat="MM" /></set></li>
+        </condition>
+        <condition var="is_anyo">
+          <li><value></value><set var="is_anyo"><date format="%Y" jformat="yy" /></set></li>
+      </condition>
+    </think>Muy bien voy a comprobarlo, espere un momentico...
+       <srai>LIBRE <star index="3"/> <get var="is_mes"/> <get var="is_anyo"/> </srai>
+    </template>
+  </category>
+
+  <!-- REGLA Nº19 -->
+  <category>
+    <pattern> NO (QUIERO) ^  </pattern>
+    <template>¡Lo sentimos mucho!</template>
+  </category>
+
+  <topic name="other_day">
+  <category>
+    <pattern> ^ [SI SÍ VALE VENGA OK+ PERFE+] ^ </pattern>
+    <template>Pues dime, ¿Qué otro día le vendría bien?
+    </template>
+  </category>
+</topic>
+
+  <category>
+    <pattern> [JA+ KS+ HA+ LOL LMAO XD] </pattern>
+    <template>
+      <random>
+        <li>xD</li>
+        <li>Jsjdfaj</li>
+        <li>skdfjaskdjf</li>
+        <li>lol</li>
+        <li>lmao</li>
+      </random>
+    </template>
+  </category>
+
+  <topic name="day_set">
+
+  <!-- REGLA Nº1 -->
+    <!-- Iteramos sobre los valores de la lista creado por funciones anteriores, es decir, esta
+      es apenas una función auxiliar para mantener el principio de programación "DRY". 
+    Básicamente itera sobre los valores de la lista buscando huecos O(n) -->
+  <category>
+    <pattern>CHECKLIBRE</pattern>
+      <template><think>
+      <set var="value"><srai> ITERATE <get name="list_key"/> </srai> </set>
+      <set name="checklibre_ret">FALSE</set>
+      <condition var="value">
+        <li value="$"></li>
+        <li value="NOLIBRE">
+          <set var="value"><srai>NEXT</srai></set>
+          <loop/>
+        </li>
+        <li value="LIBRE"><set name="checklibre_ret">TRUE</set></li>
+      </condition>
+      </think>  
+    </template>
+  </category>
+
+  <!-- REGLA Nº7 -->
+   <!-- <that> LIBRE EL * </that> -->
+<category>
+  <pattern> HORA+ </pattern>
+    <template><srai>HORASLIBRES DE 8 A 20</srai>
+    </template>
+  </category>
+  
+  <!-- REGLA Nº14 -->
+   <!-- <that> LIBRE EL * </that> -->
+   <!-- <that> CITA EL * </that> -->
+ <category>
+   <pattern> ^ HORA+ ([POR DE]) (LA) (HL)TARDE ^ </pattern>
+   <template><srai> TARDE <srai> DECODE <get name="key_fecha"/> </srai> </srai>
+    </template>
+  </category>
+
+  <!-- REGLA Nº11 -->
+   <!-- <that> LIBRE EL * </that> -->
+   <!-- <that> CITA EL * </that> -->
+ <category>
+   <pattern> ^ HORA+ ([POR DE]) (LA) (HL)MANYANA </pattern>
+   <template><srai> MANYANA <srai> DECODE <get name="key_fecha"/> </srai> </srai>
+    </template>
+  </category>
+
+  <!-- REGLA Nº18 -->
+  <category>
+    <pattern> ^ [SIRVE ACUERDO AFIRMATIVO BUENO VENGA SI SÍ VALE PERFE+ OK+ VA PUEDE] ([SER VA]) </pattern>
+    <template><condition name="checklibre_ret">
+        <li value="TRUE"><srai>TODOS HORARIOS</srai></li>
+        <li value="FALSE">Pues dígame,¿Qué otro día le vendría bien?</li>
+      </condition>
+    </template>
+  </category>
+
+ <!-- REGLA Nº20 -->
+  <!-- UPDATED AND OVERWRITTEN IN NIVEL3.aiml -->
+  <category>
+    <pattern>TODOS HORARIOS</pattern>
+    <template>
+      Pues <srai>HORARIO MANYANA</srai> y <srai>HORARIO TARDE</srai>
+      ¿A qué hora le vendría bien?
+    </template>
+  </category>
+
+  <!-- REGLA Nº21 -->
+  <!--    <that> TODOS HORARIOS </that>
+    <that> HORARIOS MANYANA </that>
+    <that> HORARIOS TARDE </that> -->
+  <category>
+    <pattern> # [CUALQU+ IGUAL IMPORTA INDIFERENTE] ^ </pattern>
+    <template>
+      <think>
+        <srai>HORARIOLIBRE</srai>
+        <set name="first_value"><srai>TOP <get name="list_horario"/></srai></set>
+      </think><srai>MARCAR CITA A LAS <get name="first_value"/> </srai>
+      </template>
+  </category>
+
+  <!-- REGLA Nº22 -->
+  <category>
+    <pattern> MARC+ CITA+ (A) (LAS) <set>horas_validas</set> </pattern>
+    <template><think><srai>MARK NOLIBRE AT <star index="1"/> ON <get name="key_fecha"/></srai>
+        <set var="key_fecha"><srai>DECODE <get name="key_fecha"/> </srai> </set>
+        <set var="day"><srai>TOP <get var="key_fecha"/></srai></set>
+        <set var="key_fecha"><srai> REMAIN <get var="key_fecha"/> </srai> </set>
+        <set var="month"><map name="rmonth"><srai>TOP <get var="key_fecha"/> </srai></map></set>
+        <set var="key_fecha"><srai>REMAIN <get var="key_fecha"/> </srai> </set>
+      </think>Perfecto! Tienes la cita para la(s) <star index="1"/> del <get var="day"/> de <get var="month"/> del <get var="key_fecha"/>
+    </template>
+  </category>
+
+  <!-- REGLA Nº23 -->
+  <category>
+    <pattern> ^ A LA(S) <set>horas_validas</set> ^ </pattern>
+    <template><condition name="checklibre_ret">
+        <li value="FALSE">Pérdon, pero creo que este día está ocupado,¿Quizás probamos otro?</li>
+        <li value="TRUE"><think>
+            <set var="temp"> <srai> HORARIOLIBRE </srai> </set>
+            <set var="value"><srai>FINDITEM <star index="2"/> IN <get var="temp"/></srai></set>
+            </think><condition var="value">
+            <li value="0">Perdón, pero las <star index="2"/> no está disponible. 
+        Recuerde que las posibilidades son: <srai>TODOS HORARIOS</srai>. </li> 
+            <li><srai>MARCAR CITA A LAS <star index="2"/> </srai></li>
+          </condition></li>
+        </condition>
+    </template>
+  </category>
+
+  <category>
+    <pattern> ^ A LA(S) ^ </pattern>
+    <template>Perdón, pero las <star index="2"/> no está disponible. 
+        Recuerde que las posibilidades son: <srai>TODOS HORARIOS</srai>.
+    </template>
+  </category>
+
+</topic>
+
+</aiml>

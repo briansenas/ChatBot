@@ -1,0 +1,183 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<aiml version="2.0">
+
+  <!-- MUST BE SORTED -->
+  <category>
+    <pattern> $CREATE( )INTERVAL * </pattern>
+    <template><think>
+        <set var="temp"><star/></set>
+        <set var="result"><srai>TOP <get var="temp"/> </srai></set>
+        <set var="v1"><srai>ITERATE <get var="temp"/> </srai></set>
+        <set var="v2"><srai>NEXT</srai></set>
+        <condition var="v2">
+          <li value="$">
+            <set var="result"><get var="result"/> <get var="v1"/> </set>
+          </li>
+          <li>
+            <set var="v3"><srai>MINUS <get var="v2"/> 1</srai> </set>
+            <condition var="v1">
+              <li><value><get var="v3"/></value>
+                <set var="v1"><get var="v2"/></set>
+                <set var="v2"><srai>NEXT</srai></set>
+              </li>
+              <li>
+                <set var="result"><get var="result"/> <get var="v1"/> <get var="v2"/></set>
+                <set var="v1"><get var="v2"/></set>
+                <set var="v2"><srai>NEXT</srai></set>
+              </li>
+            </condition>
+            <loop/>
+          </li>
+        </condition>
+      </think><get var="result"/>
+    </template>
+  </category>
+
+  <category>
+    <pattern>HOURTONUM * </pattern>
+    <template><think>
+        <set var="temp"><star/></set>
+        <set var="result"></set>
+        <set var="value"><srai>ITERATE <get var="temp"/></srai></set>
+        <condition var="value">
+          <li value="$"></li>
+          <li>
+            <set var="value"><srai>MINUS <srai>ORDINAL <get var="value"/></srai> 1 </srai></set>
+            <set var="result"><get var="result"/> <get var="value"/> </set>
+            <set var="value"><srai>NEXT</srai></set>
+            <loop/></li>
+        </condition>
+      </think><get var="result"/>
+    </template>
+  </category>
+
+  <category>
+    <pattern>ITERATEYCOMPARE * </pattern>
+    <template><think>
+        <set var="count"><srai>COUNT <star/></srai></set>
+        <set var="v1"><srai>ITERATE <star/></srai></set>
+        <set var="v2"><srai>NEXT</srai></set>
+        </think><condition var="v1">
+        <li value="unknown"></li>
+        <li value="$"></li>
+        <li><value><get var="v2"/></value>a las <map name="ToNum_es"><get var="v1"/></map><think>
+            <set var="v2"><srai>NEXT</srai></set>
+            <set var="v1"><get var="v2"/></set>
+            <set var="v2"><srai>NEXT</srai></set>
+            <set var="count"><srai>MINUS <get var="count"/> 1 </srai></set>
+            </think><condition var="count">
+            <li value="3"> y </li>
+            <li value="2"> </li>
+            <li value="1"> </li>
+            <li>, </li>
+        </condition><loop/></li>
+        <li>de las <map name="ToNum_es"><get var="v1"/></map> a las <map name="ToNum_es"><get var="v2"/></map><think>
+            <set var="v2"><srai>NEXT</srai></set>
+            <set var="v1"><get var="v2"/></set>
+            <set var="v2"><srai>NEXT</srai></set>
+            <set var="count"><srai>MINUS <get var="count"/> 1 </srai></set>
+            </think><condition var="count">
+            <li value="3"> y </li>
+            <li value="2"> </li>
+            <li value="1"> </li>
+            <li>, </li>
+        </condition><loop/></li>
+        <li value="TRUE">entera
+      </li></condition> 
+    </template>
+  </category>
+
+  <category>
+    <pattern> $TODOS( )HORARIOS </pattern>
+    <template> Pues mira ese día tengo <think>
+      <srai>HORARIO MANYANA</srai>
+      <srai>HORARIO TARDE</srai>
+      <set var="morning"><srai>CREATE INTERVAL <srai> HOURTONUM <get name="list_morning"/></srai></srai></set>
+      <set var="tarde"><srai>CREATE INTERVAL <srai>HOURTONUM <get name="list_tarde"/></srai></srai></set>
+      </think><condition name="free_morning">
+      <li value="EMPTYLIST">la manyana entera ocupada (EMPTYLIST)</li>
+      <li value="FALSE">libre la manyana <srai>ITERATEYCOMPARE <get var="morning"/></srai></li>
+      <li value="TRUE">libre la manyana entera</li></condition> y <condition name="free_tarde">
+      <li value="EMPTYLIST">la tarde entera ocupada (EMPTYLIST).</li>
+      <li value="FALSE">por la tarde tengo libre <srai>ITERATEYCOMPARE <get var="tarde"/></srai>.</li>
+      <li value="TRUE">libre todo la tarde.</li>
+      </condition>
+      ¿A qué hora le vendría bien?
+    </template>
+  </category>
+
+  <topic name="day_set">
+    <category>
+      <pattern> # A LA(S) <set>numeros</set> ^ </pattern>
+      <template><condition name="checklibre_ret">
+          <li value="FALSE">Pérdon, pero creo que este día está ocupada, ¿Quizás probamos otro?</li>
+          <li value="TRUE"><think>
+            <condition name="free_morning">
+              <li value="EMPTYLIST"><condition name="free_tarde">
+                  <li value="EMPTYLIST"></li>
+                  <li>
+                  <set var="to_num"><map name="2digits"><map name="numeros_pm"><star index="2"/></map></map></set>
+                  </li>
+              </condition></li>
+              <li>
+                <set var="to_num"><map name="2digits"><map name="numeros"><star index="2"/></map></map></set>
+              </li>
+            </condition>
+              <set var="temp"><srai>HORARIOLIBRE</srai></set>
+              <set var="value"><srai>FINDITEM <get var="to_num"/>:00 IN <get var="temp"/></srai></set>
+              </think><condition var="value">
+              <li value="0">Perdón, pero las <star index="2"/> no está disponible.
+      <srai>TODOS HORARIOS</srai>. </li>
+        <li><srai>MARCAR CITA A LAS <get var="to_num"/>:00</srai> </li>
+          </condition>
+      </li></condition>
+      </template>
+    </category>
+
+    <category>
+      <pattern> ^ A LA(S) <set>numeros</set> ^ [DE A PARA POR] ^ MANYANA ^ </pattern>
+      <template><condition name="checklibre_ret">
+          <li value="FALSE">Pérdon, pero creo que este día está ocupada, ¿Quizás probamos otro?</li>
+          <li value="TRUE"><think>
+            <condition name="free_morning">
+              <li value="EMPTYLIST"></li>
+              <li>
+                  <set var="to_num"><map name="2digits"><map name="numeros"><star index="2"/></map></map></set>
+              </li>
+            </condition> 
+              <set var="temp"><srai>HORARIOLIBRE</srai></set>
+              <set var="value"><srai>FINDITEM <get var="to_num"/>:00 IN <get var="temp"/></srai></set>
+              </think><condition var="value">
+              <li value="0">Perdón, pero las <star index="2"/> no está disponible.
+      Repito.<srai>TODOS HORARIOS</srai>. </li>
+        <li><srai>MARCAR CITA A LAS <get var="to_num"/>:00 </srai></li>
+          </condition></li>
+        </condition>
+      </template>
+    </category>
+
+    <category>
+      <pattern> # A LA(S) <set>numeros</set> ^ [DE A PARA POR] ^ $TARDE ^ </pattern>
+      <template><condition name="checklibre_ret">
+          <li value="FALSE">Pérdon, pero creo que este día está ocupada, ¿Quizás probamos otro?</li>
+          <li value="TRUE"><think>
+            <condition name="free_tarde">
+              <li value="EMPTYLIST"></li>
+              <li>
+                  <set var="to_num"><map name="2digits"><map name="numeros_pm"><star index="2"/></map></map></set>
+              </li>
+            </condition> 
+              <set var="temp"><srai>HORARIOLIBRE</srai></set>
+              <set var="value"><srai>FINDITEM <get var="to_num"/>:00 IN <get var="temp"/></srai></set>
+              </think><condition var="value">
+              <li value="0">Perdón, pero las <star index="2"/> no está disponible.
+      Repito.<srai>TODOS HORARIOS</srai>. </li>
+        <li><srai>MARCAR CITA A LAS <get var="to_num"/>:00 </srai></li>
+          </condition></li>
+        </condition>
+      </template>
+    </category>
+
+  </topic>
+
+</aiml>
